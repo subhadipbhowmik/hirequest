@@ -4,7 +4,6 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import {
   FiCalendar,
-  FiDollarSign,
   FiMapPin,
   FiBriefcase,
   FiAward,
@@ -14,6 +13,7 @@ import {
   FiArrowLeft,
 } from "react-icons/fi";
 import { Toaster, toast } from "react-hot-toast";
+import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 
 const PlacementDetails = () => {
   const { id } = useParams();
@@ -210,7 +210,7 @@ const PlacementDetails = () => {
                   </h3>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-gray-600">
-                      <FiDollarSign className="flex-shrink-0 mr-2 text-gray-400" />
+                      <RiMoneyRupeeCircleLine className="flex-shrink-0 mr-2 text-gray-400" />
                       <span>
                         <span className="font-medium">CTC:</span> ₹
                         {placement.payPackage.salary.ctc}
@@ -218,7 +218,7 @@ const PlacementDetails = () => {
                     </div>
                     {placement.payPackage.salary.variable > 0 && (
                       <div className="flex items-center text-sm text-gray-600">
-                        <FiDollarSign className="flex-shrink-0 mr-2 text-gray-400" />
+                        <RiMoneyRupeeCircleLine className="flex-shrink-0 mr-2 text-gray-400" />
                         <span>
                           <span className="font-medium">Variable Pay:</span> ₹
                           {placement.payPackage.salary.variable}
@@ -227,7 +227,7 @@ const PlacementDetails = () => {
                     )}
                     {placement.payPackage.internshipStipend.amount > 0 && (
                       <div className="flex items-center text-sm text-gray-600">
-                        <FiDollarSign className="flex-shrink-0 mr-2 text-gray-400" />
+                        <RiMoneyRupeeCircleLine className="flex-shrink-0 mr-2 text-gray-400" />
                         <span>
                           <span className="font-medium">
                             Internship Stipend:
