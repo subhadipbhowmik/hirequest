@@ -15,7 +15,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<SignUp />} />
       </Routes>
-      <Toaster />
+      <Toaster position="right-bottom" />
       <Footer />
     </>
   );

@@ -3,6 +3,7 @@ const connectDB = require("./config/db.js");
 const cors = require("cors");
 const app = express();
 const dotenv = require("dotenv");
+const placementRoutes = require("./routes/placementRoutes");
 
 dotenv.config();
 
@@ -26,6 +27,8 @@ app.get("/api/status", (req, res) => {
 
 // Student routes
 app.use("/api/students", require("./routes/studentRoutes"));
+app.use("/api", placementRoutes);
+app.use("/api", placementRoutes);
 
 app.listen(5005, () => console.log("Server started on port 5005"));
 
