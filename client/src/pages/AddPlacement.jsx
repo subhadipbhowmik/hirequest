@@ -3,6 +3,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { CircleX } from "lucide-react";
 
 export const AddPlacement = () => {
   const navigate = useNavigate();
@@ -12,8 +13,8 @@ export const AddPlacement = () => {
     driveType: "In-Person",
     campusDriveDate: "",
     companyWebsite: "",
-    streamRequired: [], // Changed to empty array
-    eligibilityCriteria: [], // Changed to empty array
+    streamRequired: [],
+    eligibilityCriteria: [],
     batch: "",
     position: "",
     jobProfile: "",
@@ -24,7 +25,7 @@ export const AddPlacement = () => {
       salary: { ctc: "", variable: 0 },
     },
     anyBond: "",
-    placementProcess: [], // Changed to empty array
+    placementProcess: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -64,7 +65,7 @@ export const AddPlacement = () => {
 
     try {
       const response = await axios.post(
-        "https://hirequest-4cy7.onrender.com/api/placements", // Corrected URL
+        "https://hirequest-4cy7.onrender.com/api/placements",
         {
           ...formData,
           batch: Number(formData.batch),
@@ -87,7 +88,7 @@ export const AddPlacement = () => {
       );
 
       toast.success("Placement added successfully!");
-      setTimeout(() => navigate("/placements"), 1000); // Reduced delay to 1 second
+      setTimeout(() => navigate("/placements"), 1000);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to add placement");
       console.error("Add placement error:", error);
@@ -103,7 +104,7 @@ export const AddPlacement = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+        className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 mt-12"
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
@@ -120,13 +121,13 @@ export const AddPlacement = () => {
             className="bg-white shadow rounded-lg p-6"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* First Grid: Company, Job, Logistics */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Company Information - Column 1 */}
+                {/* Company Information */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                     Company Details
                   </h3>
-
                   <div>
                     <label
                       htmlFor="companyName"
@@ -145,7 +146,6 @@ export const AddPlacement = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
-
                   <div>
                     <label
                       htmlFor="companyDescription"
@@ -163,7 +163,6 @@ export const AddPlacement = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
-
                   <div>
                     <label
                       htmlFor="driveType"
@@ -185,7 +184,6 @@ export const AddPlacement = () => {
                       <option value="Hybrid">Hybrid</option>
                     </select>
                   </div>
-
                   <div>
                     <label
                       htmlFor="companyWebsite"
@@ -207,12 +205,11 @@ export const AddPlacement = () => {
                   </div>
                 </div>
 
-                {/* Job Details - Column 2 */}
+                {/* Job Details */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                     Job Details
                   </h3>
-
                   <div>
                     <label
                       htmlFor="position"
@@ -231,7 +228,6 @@ export const AddPlacement = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
-
                   <div>
                     <label
                       htmlFor="jobProfile"
@@ -249,7 +245,6 @@ export const AddPlacement = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
-
                   <div>
                     <label
                       htmlFor="jobLocation"
@@ -268,7 +263,6 @@ export const AddPlacement = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
-
                   <div>
                     <label
                       htmlFor="batch"
@@ -290,12 +284,11 @@ export const AddPlacement = () => {
                   </div>
                 </div>
 
-                {/* Logistics - Column 3 */}
+                {/* Logistics */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
-                    Logistics
+                    Importants
                   </h3>
-
                   <div>
                     <label
                       htmlFor="campusDriveDate"
@@ -314,7 +307,6 @@ export const AddPlacement = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
-
                   <div>
                     <label
                       htmlFor="dateOfJoining"
@@ -331,7 +323,6 @@ export const AddPlacement = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
-
                   <div>
                     <label
                       htmlFor="anyBond"
@@ -349,7 +340,6 @@ export const AddPlacement = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
-
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
                       Salary Package*
@@ -427,9 +417,10 @@ export const AddPlacement = () => {
                 </div>
               </div>
 
-              {/* Array Fields - Full Width */}
-              <div className="space-y-4">
-                <div>
+              {/* Second Grid: Streams, Criteria, Process in One Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Eligible Streams */}
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <label className="block text-sm font-medium text-gray-700">
                       Eligible Streams*
@@ -439,12 +430,12 @@ export const AddPlacement = () => {
                       onClick={() => addArrayField("streamRequired")}
                       className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200"
                     >
-                      + Add Stream
+                      + Add
                     </button>
                   </div>
                   {formData.streamRequired.length === 0 && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Add at least one eligible stream
+                    <p className="text-xs text-gray-500 mt-1">
+                      Add at least one stream
                     </p>
                   )}
                   {formData.streamRequired.map((stream, index) => (
@@ -468,15 +459,16 @@ export const AddPlacement = () => {
                         onClick={() =>
                           removeArrayField("streamRequired", index)
                         }
-                        className="ml-2 text-red-500 hover:text-red-700"
+                        className="ml-2  text-red-500 hover:text-red-700"
                       >
-                        ×
+                        <CircleX size={20} />
                       </button>
                     </div>
                   ))}
                 </div>
 
-                <div>
+                {/* Eligibility Criteria */}
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <label className="block text-sm font-medium text-gray-700">
                       Eligibility Criteria*
@@ -486,12 +478,12 @@ export const AddPlacement = () => {
                       onClick={() => addArrayField("eligibilityCriteria")}
                       className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200"
                     >
-                      + Add Criteria
+                      + Add
                     </button>
                   </div>
                   {formData.eligibilityCriteria.length === 0 && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Add at least one eligibility criterion
+                    <p className="text-xs text-gray-500 mt-1">
+                      Add at least one criterion
                     </p>
                   )}
                   {formData.eligibilityCriteria.map((criteria, index) => (
@@ -517,13 +509,14 @@ export const AddPlacement = () => {
                         }
                         className="ml-2 text-red-500 hover:text-red-700"
                       >
-                        ×
+                        <CircleX size={20} />
                       </button>
                     </div>
                   ))}
                 </div>
 
-                <div>
+                {/* Placement Process */}
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <label className="block text-sm font-medium text-gray-700">
                       Placement Process*
@@ -533,12 +526,12 @@ export const AddPlacement = () => {
                       onClick={() => addArrayField("placementProcess")}
                       className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200"
                     >
-                      + Add Process
+                      + Add
                     </button>
                   </div>
                   {formData.placementProcess.length === 0 && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Add at least one process step
+                    <p className="text-xs text-gray-500 mt-1">
+                      Add at least one step
                     </p>
                   )}
                   {formData.placementProcess.map((process, index) => (
@@ -564,13 +557,14 @@ export const AddPlacement = () => {
                         }
                         className="ml-2 text-red-500 hover:text-red-700"
                       >
-                        ×
+                        <CircleX size={20} />
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
 
+              {/* Submit Button */}
               <div className="pt-4">
                 <motion.button
                   type="submit"
