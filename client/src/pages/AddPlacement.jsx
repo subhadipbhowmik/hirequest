@@ -88,7 +88,7 @@ export const AddPlacement = () => {
       );
 
       toast.success("Placement added successfully!");
-      setTimeout(() => navigate("/placements"), 1000);
+      setTimeout(() => navigate("/all-placements"), 1000);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to add placement");
       console.error("Add placement error:", error);
