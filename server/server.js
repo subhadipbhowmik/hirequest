@@ -8,7 +8,14 @@ dotenv.config();
 
 // middlewares
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://hirequest-cu.vercel.app",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // connect to db
 connectDB();
