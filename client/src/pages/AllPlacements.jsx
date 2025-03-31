@@ -5,11 +5,11 @@ import { Link } from "react-router-dom";
 import {
   FiExternalLink,
   FiCalendar,
-  FiDollarSign,
   FiMapPin,
   FiBriefcase,
   FiAward,
 } from "react-icons/fi";
+import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 
 export const AllPlacements = () => {
   const [placements, setPlacements] = useState([]);
@@ -132,7 +132,7 @@ export const AllPlacements = () => {
                     <span>{placement.jobLocation}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <FiDollarSign className="flex-shrink-0 mr-2 text-gray-400" />
+                    <RiMoneyRupeeCircleLine className="flex-shrink-0 mr-2 text-gray-400" />
                     <span>CTC: ₹{placement.payPackage.salary.ctc}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
