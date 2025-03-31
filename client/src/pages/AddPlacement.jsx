@@ -12,8 +12,8 @@ export const AddPlacement = () => {
     driveType: "In-Person",
     campusDriveDate: "",
     companyWebsite: "",
-    streamRequired: [""],
-    eligibilityCriteria: [""],
+    streamRequired: [], // Changed to empty array
+    eligibilityCriteria: [], // Changed to empty array
     batch: "",
     position: "",
     jobProfile: "",
@@ -24,7 +24,7 @@ export const AddPlacement = () => {
       salary: { ctc: "", variable: 0 },
     },
     anyBond: "",
-    placementProcess: [""],
+    placementProcess: [], // Changed to empty array
   });
   const [loading, setLoading] = useState(false);
 
@@ -64,10 +64,9 @@ export const AddPlacement = () => {
 
     try {
       const response = await axios.post(
-        "https://hirequest-4cy7.onrender.com/api/placements",
+        "https://hirequest-4cy7.onrender.com/api/placements", // Corrected URL
         {
           ...formData,
-          // Convert empty strings to numbers where needed
           batch: Number(formData.batch),
           payPackage: {
             ...formData.payPackage,
@@ -88,7 +87,7 @@ export const AddPlacement = () => {
       );
 
       toast.success("Placement added successfully!");
-      setTimeout(() => navigate("/placements"), 1500);
+      setTimeout(() => navigate("/placements"), 1000); // Reduced delay to 1 second
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to add placement");
       console.error("Add placement error:", error);
@@ -121,49 +120,64 @@ export const AddPlacement = () => {
             className="bg-white shadow rounded-lg p-6"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Company Information - Column 1 */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Company Information - Column 1 */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
                     Company Details
                   </h3>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="companyName"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Company Name*
                     </label>
                     <input
+                      id="companyName"
                       type="text"
                       name="companyName"
                       value={formData.companyName}
                       onChange={handleChange}
                       required
+                      aria-required="true"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="companyDescription"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Company Description
                     </label>
                     <textarea
+                      id="companyDescription"
                       name="companyDescription"
                       value={formData.companyDescription}
                       onChange={handleChange}
                       rows={3}
+                      placeholder="Briefly describe the company..."
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="driveType"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Drive Type*
                     </label>
                     <select
+                      id="driveType"
                       name="driveType"
                       value={formData.driveType}
                       onChange={handleChange}
                       required
+                      aria-required="true"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     >
                       <option value="In-Person">In-Person</option>
@@ -173,15 +187,21 @@ export const AddPlacement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="companyWebsite"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Website URL*
                     </label>
                     <input
+                      id="companyWebsite"
                       type="url"
                       name="companyWebsite"
                       value={formData.companyWebsite}
                       onChange={handleChange}
                       required
+                      aria-required="true"
+                      placeholder="https://example.com"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
@@ -194,56 +214,77 @@ export const AddPlacement = () => {
                   </h3>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="position"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Position*
                     </label>
                     <input
+                      id="position"
                       type="text"
                       name="position"
                       value={formData.position}
                       onChange={handleChange}
                       required
+                      aria-required="true"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="jobProfile"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Job Profile
                     </label>
                     <textarea
+                      id="jobProfile"
                       name="jobProfile"
                       value={formData.jobProfile}
                       onChange={handleChange}
                       rows={3}
+                      placeholder="Describe the job role..."
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="jobLocation"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Job Location*
                     </label>
                     <input
+                      id="jobLocation"
                       type="text"
                       name="jobLocation"
                       value={formData.jobLocation}
                       onChange={handleChange}
                       required
+                      aria-required="true"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="batch"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Eligible Batch*
                     </label>
                     <input
+                      id="batch"
                       type="number"
                       name="batch"
                       value={formData.batch}
                       onChange={handleChange}
                       required
+                      aria-required="true"
+                      min="2000"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
@@ -256,24 +297,33 @@ export const AddPlacement = () => {
                   </h3>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="campusDriveDate"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Drive Date*
                     </label>
                     <input
+                      id="campusDriveDate"
                       type="datetime-local"
                       name="campusDriveDate"
                       value={formData.campusDriveDate}
                       onChange={handleChange}
                       required
+                      aria-required="true"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="dateOfJoining"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Joining Date
                     </label>
                     <input
+                      id="dateOfJoining"
                       type="date"
                       name="dateOfJoining"
                       value={formData.dateOfJoining}
@@ -283,29 +333,37 @@ export const AddPlacement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="anyBond"
+                      className="block text-sm font-medium text-gray-700"
+                    >
                       Bond Details
                     </label>
                     <input
+                      id="anyBond"
                       type="text"
                       name="anyBond"
                       value={formData.anyBond}
                       onChange={handleChange}
+                      placeholder="e.g., 2 years"
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
-                  {/* Salary Package */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
                       Salary Package*
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-xs text-gray-500">
+                        <label
+                          htmlFor="ctc"
+                          className="block text-xs text-gray-500"
+                        >
                           CTC (₹)
                         </label>
                         <input
+                          id="ctc"
                           type="text"
                           value={formData.payPackage.salary.ctc}
                           onChange={(e) =>
@@ -315,14 +373,19 @@ export const AddPlacement = () => {
                             })
                           }
                           required
+                          aria-required="true"
                           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-500">
+                        <label
+                          htmlFor="variablePay"
+                          className="block text-xs text-gray-500"
+                        >
                           Variable Pay (₹)
                         </label>
                         <input
+                          id="variablePay"
                           type="number"
                           value={formData.payPackage.salary.variable}
                           onChange={(e) =>
@@ -331,24 +394,32 @@ export const AddPlacement = () => {
                               variable: e.target.value,
                             })
                           }
+                          min="0"
                           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500">
+                      <label
+                        htmlFor="internshipStipend"
+                        className="block text-xs text-gray-500"
+                      >
                         Internship Stipend (₹)
                       </label>
                       <input
+                        id="internshipStipend"
                         type="number"
                         value={formData.payPackage.internshipStipend.amount}
                         onChange={(e) =>
                           handleNestedChange(
                             "payPackage",
                             "internshipStipend",
-                            { amount: e.target.value }
+                            {
+                              amount: e.target.value,
+                            }
                           )
                         }
+                        min="0"
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
@@ -366,11 +437,16 @@ export const AddPlacement = () => {
                     <button
                       type="button"
                       onClick={() => addArrayField("streamRequired")}
-                      className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded"
+                      className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200"
                     >
                       + Add Stream
                     </button>
                   </div>
+                  {formData.streamRequired.length === 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Add at least one eligible stream
+                    </p>
+                  )}
                   {formData.streamRequired.map((stream, index) => (
                     <div key={index} className="flex mt-1">
                       <input
@@ -384,19 +460,18 @@ export const AddPlacement = () => {
                           )
                         }
                         required
+                        aria-required="true"
                         className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
-                      {formData.streamRequired.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeArrayField("streamRequired", index)
-                          }
-                          className="ml-2 text-red-500 hover:text-red-700"
-                        >
-                          ×
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeArrayField("streamRequired", index)
+                        }
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        ×
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -409,11 +484,16 @@ export const AddPlacement = () => {
                     <button
                       type="button"
                       onClick={() => addArrayField("eligibilityCriteria")}
-                      className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded"
+                      className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200"
                     >
                       + Add Criteria
                     </button>
                   </div>
+                  {formData.eligibilityCriteria.length === 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Add at least one eligibility criterion
+                    </p>
+                  )}
                   {formData.eligibilityCriteria.map((criteria, index) => (
                     <div key={index} className="flex mt-1">
                       <input
@@ -427,19 +507,18 @@ export const AddPlacement = () => {
                           )
                         }
                         required
+                        aria-required="true"
                         className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
-                      {formData.eligibilityCriteria.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeArrayField("eligibilityCriteria", index)
-                          }
-                          className="ml-2 text-red-500 hover:text-red-700"
-                        >
-                          ×
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeArrayField("eligibilityCriteria", index)
+                        }
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        ×
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -452,11 +531,16 @@ export const AddPlacement = () => {
                     <button
                       type="button"
                       onClick={() => addArrayField("placementProcess")}
-                      className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded"
+                      className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded hover:bg-indigo-200"
                     >
                       + Add Process
                     </button>
                   </div>
+                  {formData.placementProcess.length === 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Add at least one process step
+                    </p>
+                  )}
                   {formData.placementProcess.map((process, index) => (
                     <div key={index} className="flex mt-1">
                       <input
@@ -470,19 +554,18 @@ export const AddPlacement = () => {
                           )
                         }
                         required
+                        aria-required="true"
                         className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
-                      {formData.placementProcess.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeArrayField("placementProcess", index)
-                          }
-                          className="ml-2 text-red-500 hover:text-red-700"
-                        >
-                          ×
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeArrayField("placementProcess", index)
+                        }
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        ×
+                      </button>
                     </div>
                   ))}
                 </div>
