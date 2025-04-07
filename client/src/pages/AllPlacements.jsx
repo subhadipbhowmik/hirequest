@@ -72,7 +72,7 @@ export const AllPlacements = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-gray-50 mt-20 py-8 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
