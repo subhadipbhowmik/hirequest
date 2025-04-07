@@ -47,7 +47,7 @@ const PlacementAutomation = () => {
               <span>Track placement progress</span>
             </li>
           </ul>
-          <a href="/register" className="cursor-pointer">
+          <a href="/sign-up" className="cursor-pointer">
             <button className="mt-6 cursor-pointer px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition">
               Register as Student
             </button>
@@ -84,9 +84,9 @@ const PlacementAutomation = () => {
               <span>Evaluate & select candidates</span>
             </li>
           </ul>
-          <a href="/register" className="cursor-pointer">
+          <a href="/add-placement" className="cursor-pointer">
             <button className="mt-6 px-6 py-3 cursor-pointer bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition">
-              Register as Coordinator
+              Are You Admin? Then Add Placements
             </button>
           </a>
         </div>

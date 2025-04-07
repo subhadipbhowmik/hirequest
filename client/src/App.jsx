@@ -9,6 +9,7 @@ import { AddPlacement } from "./pages/AddPlacement.jsx";
 import { AllPlacements } from "./pages/AllPlacements.jsx";
 import PlacementDetails from "./pages/PlacementDetails.jsx";
 import About from "./pages/About.jsx";
+import Resources from "./pages/Resources.jsx";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
 
         {/* basic pages  */}
         <Route path="/about" element={<About />} />
+        <Route path="/resources" element={<Resources />} />
       </Routes>
       <Toaster position="right-bottom" />
       <Footer />
