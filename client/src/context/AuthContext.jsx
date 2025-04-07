@@ -5,82 +5,29 @@ import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // Initialize axios defaults
+  // Initialize axios headers and check auth state
   useEffect(() => {
-    axios.defaults.baseURL =
-      import.meta.env.VITE_API_URL || "http://localhost:5005/api";
+    const initializeAuth = async () => {
+      const token = localStorage.getItem("token");
 
-    const token = localStorage.getItem("hireQuestToken");
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem("hireQuestToken");
-      if (!token) {
-        setLoading(false);
-        return;
+      if (token) {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        try {
+          const response = await axios.get("/api/students/profile");
+          setUser(response.data);
+        } catch (error) {
+          logout();
+        }
       }
-
-      const response = await axios.get("/students/validate-session");
-      setUser(response.data.user);
-
-      // Verify token with backend
-      const response = await axios.get("/students/profile");
-      setUser(response.data.student);
-    } catch (error) {
-      localStorage.removeItem("token");
-      console.error("Auth check error:", error);
-      logout();
-    } finally {
       setLoading(false);
-    }
-  };
+    };
 
-  useEffect(() => {
-    checkAuth();
+    initializeAuth();
   }, []);
-
-  const handleAuthResponse = (response) => {
-    const { token, student } = response.data;
-    localStorage.setItem("hireQuestToken", token);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    setUser(student);
-    return student;
-  };
-
-  const signup = async (formData) => {
-    try {
-      const response = await axios.post("/students/signup", formData);
-      handleAuthResponse(response);
-      return true;
-    } catch (error) {
-      throw new Error(error.response?.data?.error || "Registration failed");
-    }
-  };
-
-  const login = async (email, password) => {
-    try {
-      const response = await axios.post("/students/login", { email, password });
-      handleAuthResponse(response);
-      return true;
-    } catch (error) {
-      throw new Error(error.response?.data?.error || "Login failed");
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem("hireQuestToken");
-    delete axios.defaults.headers.common["Authorization"];
-    setUser(null);
-    navigate("/login");
-  };
 
   // Axios response interceptor
   useEffect(() => {
@@ -89,7 +36,6 @@ export function AuthProvider({ children }) {
       (error) => {
         if (error.response?.status === 401) {
           logout();
-          navigate("/login");
         }
         return Promise.reject(error);
       }
@@ -98,11 +44,53 @@ export function AuthProvider({ children }) {
     return () => axios.interceptors.response.eject(interceptor);
   }, []);
 
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post("/api/students/login", {
+        email,
+        password,
+      });
+
+      localStorage.setItem("token", response.data.token);
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.token}`;
+      setUser(response.data.user);
+
+      return true;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Login failed");
+    }
+  };
+
+  const signup = async (formData) => {
+    try {
+      const response = await axios.post("/api/students/signup", formData);
+
+      localStorage.setItem("token", response.data.token);
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.token}`;
+      setUser(response.data.user);
+
+      return true;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Registration failed");
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    delete axios.defaults.headers.common["Authorization"];
+    setUser(null);
+    navigate("/login");
+  };
+
   const value = {
     user,
     loading,
-    signup,
     login,
+    signup,
     logout,
     isAuthenticated: !!user,
   };
