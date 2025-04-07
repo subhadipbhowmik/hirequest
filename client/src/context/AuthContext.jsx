@@ -20,21 +20,30 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem("hireQuestToken");
-        if (token) {
-          const response = await axios.get("/students/profile");
-          setUser(response.data);
-        }
-      } catch (error) {
-        logout();
-      } finally {
+  const checkAuth = async () => {
+    try {
+      const token = localStorage.getItem("hireQuestToken");
+      if (!token) {
         setLoading(false);
+        return;
       }
-    };
 
+      const response = await axios.get("/students/validate-session");
+      setUser(response.data.user);
+
+      // Verify token with backend
+      const response = await axios.get("/students/profile");
+      setUser(response.data.student);
+    } catch (error) {
+      localStorage.removeItem("token");
+      console.error("Auth check error:", error);
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     checkAuth();
   }, []);
 
@@ -49,7 +58,7 @@ export function AuthProvider({ children }) {
   const signup = async (formData) => {
     try {
       const response = await axios.post("/students/signup", formData);
-      const student = handleAuthResponse(response);
+      handleAuthResponse(response);
       return true;
     } catch (error) {
       throw new Error(error.response?.data?.error || "Registration failed");
@@ -73,27 +82,14 @@ export function AuthProvider({ children }) {
     navigate("/login");
   };
 
-  const refreshToken = async () => {
-    try {
-      const response = await axios.post("/students/refresh-token");
-      handleAuthResponse(response);
-      return true;
-    } catch (error) {
-      logout();
-      return false;
-    }
-  };
-
   // Axios response interceptor
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-          await refreshToken();
-          return axios(originalRequest);
+      (error) => {
+        if (error.response?.status === 401) {
+          logout();
+          navigate("/login");
         }
         return Promise.reject(error);
       }
@@ -125,5 +121,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-export default AuthProvider;

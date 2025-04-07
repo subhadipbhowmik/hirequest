@@ -3,6 +3,14 @@ const Application = require("../models/Application");
 const jwt = require("jsonwebtoken");
 const { fetchStatusFromSheet } = require("../services/sheetsService");
 
+// Get authenticated user's profile
+const getAuthUser = async (userId) => {
+  return await Student.findById(userId).populate({
+    path: "applications",
+    populate: { path: "placement", select: "companyName position" },
+  });
+};
+
 // Signup
 const signup = async (req, res) => {
   try {
@@ -16,7 +24,10 @@ const signup = async (req, res) => {
     });
 
     if (existing) {
-      return res.status(409).json({ error: "User already exists" });
+      return res.status(409).json({
+        success: false,
+        error: "User already exists",
+      });
     }
 
     // Create user
@@ -26,15 +37,23 @@ const signup = async (req, res) => {
     const token = jwt.sign(
       { id: student._id },
       process.env.JWT_SECRET || "default_secret",
-      {
-        expiresIn: "7d",
-      }
+      { expiresIn: "7d" }
     );
 
-    res.status(201).json({ token, student });
+    // Get full user data with applications
+    const userData = await getAuthUser(student._id);
+
+    res.status(201).json({
+      success: true,
+      token,
+      user: userData,
+    });
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json({ error: "Registration failed" });
+    res.status(500).json({
+      success: false,
+      error: error.message || "Registration failed",
+    });
   }
 };
 
@@ -47,35 +66,59 @@ const login = async (req, res) => {
     });
 
     if (!student) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({
+        success: false,
+        error: "Invalid credentials",
+      });
     }
 
+    // Generate token
     const token = jwt.sign(
       { id: student._id },
       process.env.JWT_SECRET || "default_secret",
-      {
-        expiresIn: "7d",
-      }
+      { expiresIn: "7d" }
     );
 
-    res.json({ token, student });
+    // Get full user data with applications
+    const userData = await getAuthUser(student._id);
+
+    res.json({
+      success: true,
+      token,
+      user: userData,
+    });
   } catch (error) {
-    res.status(500).json({ error: "Login failed" });
+    res.status(500).json({
+      success: false,
+      error: error.message || "Login failed",
+    });
   }
 };
 
 // Get profile
 const getProfile = async (req, res) => {
   try {
-    const student = await Student.findById(req.user._id).populate({
-      path: "applications",
-      populate: { path: "placement", select: "companyName position" },
-    });
-
-    res.json(student.applications);
+    const userData = await getAuthUser(req.user._id);
+    res.json({ success: true, data: userData.applications });
   } catch (error) {
-    res.status(500).json({ error: "Profile load failed" });
+    res.status(500).json({
+      success: false,
+      error: error.message || "Profile load failed",
+    });
   }
 };
 
-module.exports = { signup, login, getProfile };
+// Validate session
+const validateSession = async (req, res) => {
+  try {
+    const userData = await getAuthUser(req.user._id);
+    res.json({ success: true, user: userData });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message || "Session validation failed",
+    });
+  }
+};
+
+module.exports = { signup, login, getProfile, validateSession };
