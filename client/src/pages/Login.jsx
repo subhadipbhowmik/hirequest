@@ -44,7 +44,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex mt-30 items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex mt-20 items-center justify-center p-4">
       <Toaster position="top-center" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -71,7 +71,7 @@ const Login = () => {
             control={control}
             error={errors.email}
             type="email"
-            placeholder="student@example.com"
+            placeholder="shubhadip@codingport.in"
           />
 
           <FormInput
@@ -80,7 +80,7 @@ const Login = () => {
             control={control}
             error={errors.password}
             type="password"
-            placeholder="••••••••"
+            placeholder="Shubhadip@Daliya"
           />
 
           <div className="flex items-center justify-between">
