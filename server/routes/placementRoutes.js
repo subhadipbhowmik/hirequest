@@ -1,13 +1,15 @@
+// routes/placementRoutes.js
 const express = require("express");
 const router = express.Router();
-const placementController = require("../controllers/placementController");
-const coordinatorAuth = require("../middleware/coordinatorAuth");
+const {
+  addPlacement,
+  getAllPlacements,
+  getPlacement,
+} = require("../controllers/placementController");
 
-// Public endpoints
-router.get("/", placementController.getAllPlacements);
-router.get("/:id", placementController.getPlacement);
-
-// Protected coordinator endpoints
-router.post("/", coordinatorAuth, placementController.addPlacement);
+// Public routes
+router.post("/", addPlacement); // No auth middleware
+router.get("/", getAllPlacements);
+router.get("/:id", getPlacement);
 
 module.exports = router;

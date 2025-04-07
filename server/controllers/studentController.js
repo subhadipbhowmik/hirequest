@@ -2,123 +2,90 @@ const Student = require("../models/Student");
 const Application = require("../models/Application");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const {
-  fetchStatusFromSheet,
-  getStudentStatus,
-} = require("../services/sheetsService");
+const { fetchStatusFromSheet } = require("../services/sheetsService");
 
-// Signup with auto-login
+// Utility: Remove sensitive fields
+const sanitizeStudent = ({
+  _id,
+  name,
+  course,
+  uid,
+  email,
+  phoneNumber,
+  applications,
+}) => ({ _id, name, course, uid, email, phoneNumber, applications });
+
+// Signup
 const signup = async (req, res) => {
   try {
-    const { name, course, uid, phoneNumber, email, password } = req.body;
-
-    // Existing user check
-    const existingStudent = await Student.findOne({
-      $or: [{ email }, { uid }, { phoneNumber }],
+    const existing = await Student.findOne({
+      $or: [
+        { email: req.body.email },
+        { uid: req.body.uid },
+        { phoneNumber: req.body.phoneNumber },
+      ],
     });
-    if (existingStudent)
-      return res.status(400).json({ error: "User already exists" });
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    if (existing) return res.status(400).json({ error: "User exists" });
 
     const student = await Student.create({
-      name,
-      course,
-      uid,
-      phoneNumber,
-      email,
-      password: hashedPassword,
+      ...req.body,
+      password: await bcrypt.hash(req.body.password, 12),
     });
 
-    // Generate JWT
     const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-
-    res.status(201).json({ token, student });
+    res.status(201).json({ token, student: sanitizeStudent(student) });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Registration failed" });
   }
 };
 
 // Login
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const student = await Student.findOne({ email });
-
-    if (!student || !(await bcrypt.compare(password, student.password))) {
+    const student = await Student.findOne({ email: req.body.email });
+    if (
+      !student ||
+      !(await bcrypt.compare(req.body.password, student.password))
+    ) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-
-    res.json({ token, student });
+    res.json({ token, student: sanitizeStudent(student) });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Login failed" });
   }
 };
 
-// Get student profile with applications and statuses
+// Get profile
 const getProfile = async (req, res) => {
   try {
-    const student = await Student.findById(req.userId).populate({
+    const student = await Student.findById(req.user._id).populate({
       path: "applications",
       populate: { path: "placement", select: "companyName position" },
     });
 
-    // Get statuses from Google Sheet
     const sheetStatuses = await fetchStatusFromSheet({
       uid: student.uid,
       email: student.email,
       phone: student.phoneNumber,
     });
 
-    // Merge application data with sheet statuses
     const profileData = student.applications.map((app) => ({
-      company: app.placement.companyName,
-      position: app.placement.position,
+      company: app.placement?.companyName || "Unknown Company",
+      position: app.placement?.position || "N/A",
       appliedDate: app.appliedAt,
-      status: sheetStatuses[app.placement.companyName] || "Pending",
+      status: sheetStatuses[app.placement?.companyName] || "Pending",
     }));
 
     res.json(profileData);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Profile load failed" });
   }
 };
 
-// Get student profile with applications and statuses
-exports.getStudentProfile = async (req, res) => {
-  try {
-    // Get applications from DB
-    const applications = await Application.find({
-      student: req.user.id,
-    }).populate("placement", "companyName position");
-
-    // Get statuses from Google Sheet
-    const student = await Student.findById(req.user.id);
-    const sheetStatuses = await getStudentStatus({
-      uid: student.uid,
-      email: student.email,
-      phone: student.phoneNumber,
-    });
-
-    // Merge data
-    const profileData = applications.map((app) => ({
-      company: app.placement.companyName,
-      position: app.placement.position,
-      appliedDate: app.appliedAt,
-      status: sheetStatuses[app.placement.companyName] || "Under Review",
-    }));
-
-    res.json(profileData);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-module.exports = { signup, login, getProfile, getStudentProfile };
+module.exports = { signup, login, getProfile };

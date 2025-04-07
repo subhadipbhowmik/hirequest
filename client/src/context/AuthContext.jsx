@@ -1,39 +1,35 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check existing session on initial load
+  // Initialize axios defaults
+  useEffect(() => {
+    axios.defaults.baseURL =
+      import.meta.env.VITE_API_URL || "http://localhost:5005/api";
+
+    const token = localStorage.getItem("hireQuestToken");
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+  }, []);
+
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        const response = await axios.get(
-          "https://hirequest-4cy7.onrender.com/api/students/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        setUser(response.data);
+        const token = localStorage.getItem("hireQuestToken");
+        if (token) {
+          const response = await axios.get("/students/profile");
+          setUser(response.data);
+        }
       } catch (error) {
-        console.error("Auth check failed:", error);
-        localStorage.removeItem("token");
-        toast.error("Session expired. Please login again.");
+        logout();
       } finally {
         setLoading(false);
       }
@@ -42,78 +38,85 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Login function
+  const handleAuthResponse = (response) => {
+    const { token, student } = response.data;
+    localStorage.setItem("hireQuestToken", token);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    setUser(student);
+    return student;
+  };
+
+  const signup = async (formData) => {
+    try {
+      const response = await axios.post("/students/signup", formData);
+      const student = handleAuthResponse(response);
+      return true;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Registration failed");
+    }
+  };
+
   const login = async (email, password) => {
     try {
-      const { data } = await axios.post(
-        "https://hirequest-4cy7.onrender.com/api/students/login",
-        { email, password }
-      );
-
-      localStorage.setItem("token", data.token);
-      setUser(data.student);
-      toast.success("Login successful!");
-      navigate("/profile");
+      const response = await axios.post("/students/login", { email, password });
+      handleAuthResponse(response);
       return true;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Invalid credentials");
-      return false;
+      throw new Error(error.response?.data?.error || "Login failed");
     }
   };
 
-  // Signup function
-  const signup = async (studentData) => {
-    try {
-      const { data } = await axios.post(
-        "https://hirequest-4cy7.onrender.com/api/students/signup",
-        studentData
-      );
-
-      localStorage.setItem("token", data.token);
-      setUser(data.student);
-      toast.success("Account created successfully!");
-      navigate("/profile");
-      return true;
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Registration failed");
-      return false;
-    }
-  };
-
-  // Logout function
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("hireQuestToken");
+    delete axios.defaults.headers.common["Authorization"];
     setUser(null);
-    toast.success("Logged out successfully");
     navigate("/login");
   };
 
-  // Add this interceptor
-  axios.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      if (error.response?.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-      }
-      return Promise.reject(error);
+  const refreshToken = async () => {
+    try {
+      const response = await axios.post("/students/refresh-token");
+      handleAuthResponse(response);
+      return true;
+    } catch (error) {
+      logout();
+      return false;
     }
-  );
+  };
+
+  // Axios response interceptor
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          await refreshToken();
+          return axios(originalRequest);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => axios.interceptors.response.eject(interceptor);
+  }, []);
+
+  const value = {
+    user,
+    loading,
+    signup,
+    login,
+    logout,
+    isAuthenticated: !!user,
+  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        signup,
-        logout,
-      }}
-    >
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -122,3 +125,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default AuthProvider;
