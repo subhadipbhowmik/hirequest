@@ -16,8 +16,10 @@ const sanitizeStudent = ({
 }) => ({ _id, name, course, uid, email, phoneNumber, applications });
 
 // Signup
+// controllers/studentController.js
 const signup = async (req, res) => {
   try {
+    // Check for existing user
     const existing = await Student.findOne({
       $or: [
         { email: req.body.email },
@@ -25,19 +27,51 @@ const signup = async (req, res) => {
         { phoneNumber: req.body.phoneNumber },
       ],
     });
-    if (existing) return res.status(400).json({ error: "User exists" });
 
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        error: "User already exists",
+      });
+    }
+
+    // Create user
     const student = await Student.create({
       ...req.body,
       password: await bcrypt.hash(req.body.password, 12),
     });
 
+    // Verify JWT_SECRET exists
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT secret not configured");
+    }
+
+    // Generate token
     const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-    res.status(201).json({ token, student: sanitizeStudent(student) });
+
+    // Send response
+    res.status(201).json({
+      success: true,
+      token,
+      student: sanitizeStudent(student),
+    });
   } catch (error) {
-    res.status(500).json({ error: "Registration failed" });
+    console.error("Signup error:", error);
+
+    // Handle duplicate key error separately
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        error: "User already exists",
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: error.message || "Registration failed",
+    });
   }
 };
 
