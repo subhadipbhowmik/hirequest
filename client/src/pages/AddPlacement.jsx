@@ -611,3 +611,5 @@ export const AddPlacement = () => {
     </>
   );
 };
+
+export default AddPlacement;

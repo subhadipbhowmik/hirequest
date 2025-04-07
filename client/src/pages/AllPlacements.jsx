@@ -201,3 +201,5 @@ export const AllPlacements = () => {
     </motion.div>
   );
 };
+
+export default AllPlacements;
