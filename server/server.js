@@ -19,7 +19,7 @@ app.use(
       "X-Requested-With",
       "Accept",
     ],
-    exposedHeaders: ["Authorization"], // Needed for token refresh patterns
+    exposedHeaders: ["Authorization"],
   })
 );
 

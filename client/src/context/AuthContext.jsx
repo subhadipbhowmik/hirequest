@@ -9,6 +9,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const BASE_URL = "https://hirequest-4cy7.onrender.com";
+
   // Initialize axios headers and check auth state
   useEffect(() => {
     const initializeAuth = async () => {
@@ -17,7 +19,7 @@ export function AuthProvider({ children }) {
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         try {
-          const response = await axios.get("/api/students/profile");
+          const response = await axios.get(`${BASE_URL}/api/students/profile`);
           setUser(response.data);
         } catch (error) {
           logout();
@@ -46,7 +48,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post("/api/students/login", {
+      const response = await axios.post(`${BASE_URL}/api/students/login`, {
         email,
         password,
       });
@@ -65,7 +67,10 @@ export function AuthProvider({ children }) {
 
   const signup = async (formData) => {
     try {
-      const response = await axios.post("/api/students/signup", formData);
+      const response = await axios.post(
+        `${BASE_URL}/api/students/signup`,
+        formData
+      );
 
       localStorage.setItem("token", response.data.token);
       axios.defaults.headers.common[
