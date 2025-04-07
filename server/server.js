@@ -5,12 +5,12 @@ const dotenv = require("dotenv");
 const app = express();
 
 // Load environment variables first
-dotenv.config({ path: "./config/config.env" });
+dotenv.config();
 
 // Enhanced CORS configuration
 app.use(
   cors({
-    origin: "https://hirequest-cu.vercel.app" || "http://localhost:5173",
+    origin: "https://hirequest-cu.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: [
@@ -39,7 +39,6 @@ app.get("/api/status", (req, res) =>
   res.status(200).json({
     status: "OK",
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development",
   })
 );
 
@@ -48,8 +47,6 @@ app.use((err, req, res, next) => {
   console.error(`❗ [${new Date().toISOString()}] Error: ${err.message}`);
   res.status(err.statusCode || 500).json({
     success: false,
-    error: process.env.NODE_ENV === "production" ? "Server error" : err.message,
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
   });
 });
 
@@ -61,12 +58,6 @@ app.use((req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5005;
+const PORT = 5005;
 
-app.listen(PORT, () =>
-  console.log(
-    `🚀 Server running in ${
-      process.env.NODE_ENV || "development"
-    } mode on port ${PORT}`
-  )
-);
+app.listen(PORT, () => console.log(`Server running in mode on port ${PORT}`));

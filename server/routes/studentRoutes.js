@@ -7,6 +7,7 @@ const {
   getProfile,
 } = require("../controllers/studentController");
 const studentAuth = require("../middleware/studentAuth");
+const { validateSession } = require("../controllers/studentController");
 
 // Public routes (no authentication required)
 router.post("/signup", signup);
