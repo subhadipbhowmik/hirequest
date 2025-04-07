@@ -35,8 +35,9 @@ function App() {
             {/* Protected Routes - Only login required */}
             <Route element={<ProtectedRoute />}>
               <Route path="/profile" element={<Profile />} />
-              <Route path="/add-placement" element={<AddPlacement />} />
             </Route>
+
+            <Route path="/add-placement" element={<AddPlacement />} />
           </Routes>
         </main>
 

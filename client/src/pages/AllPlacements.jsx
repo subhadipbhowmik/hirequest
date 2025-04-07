@@ -43,7 +43,7 @@ export const AllPlacements = () => {
 
   if (error) {
     return (
-      <div className="bg-red-50 border-l-4 border-red-500 p-4">
+      <div className="bg-red-50 mt-20 border-l-4 border-red-500 p-4">
         <div className="flex">
           <div className="flex-shrink-0">
             <svg
