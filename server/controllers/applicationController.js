@@ -61,3 +61,33 @@ exports.getMyApplications = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
+// In your application controller
+const createApplication = async (req, res) => {
+  try {
+    const application = new Application({
+      student: req.user._id,
+      placement: req.params.placementId
+    });
+
+    await application.save();
+    
+    // Update student's applications array
+    await Student.findByIdAndUpdate(
+      req.user._id,
+      { $push: { applications: application._id } }
+    );
+
+    res.status(201).json(application);
+  } catch (error) {
+    console.error("Application error:", error);
+    res.status(400).json({ 
+      error: error.message || "Application failed" 
+    });
+  }
+};
+
+module.exports = {
+  createApplication
+};

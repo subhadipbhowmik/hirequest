@@ -3,6 +3,7 @@ const connectDB = require("./config/db.js");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const app = express();
+const helmet = require("helmet");
 
 dotenv.config();
 
@@ -13,8 +14,12 @@ app.use(
     origin: "https://hirequest-cu.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Coordinator-Key"],
   })
 );
+
+app.use(helmet());
+app.use(helmet.permittedCrossDomainPolicies());
 
 // Database connection
 connectDB();

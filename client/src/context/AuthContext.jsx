@@ -20,16 +20,20 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const { data } = await axios.get(
+        const response = await axios.get(
           "https://hirequest-4cy7.onrender.com/api/students/me",
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
         );
-        setUser(data);
+        setUser(response.data);
       } catch (error) {
+        console.error("Auth check failed:", error);
         localStorage.removeItem("token");
-        toast.error("Session expired, please login again");
+        toast.error("Session expired. Please login again.");
       } finally {
         setLoading(false);
       }
@@ -83,6 +87,18 @@ export const AuthProvider = ({ children }) => {
     toast.success("Logged out successfully");
     navigate("/login");
   };
+
+  // Add this interceptor
+  axios.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+      return Promise.reject(error);
+    }
+  );
 
   return (
     <AuthContext.Provider

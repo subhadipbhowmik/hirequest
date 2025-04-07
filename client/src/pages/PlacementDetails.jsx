@@ -61,24 +61,33 @@ const PlacementDetails = () => {
   }, [id, user]);
 
   const handleApply = async () => {
-    setShowConfirmation(false);
-    setApplying(true);
-
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please login to apply");
+        return;
+      }
+
       await axios.post(
         `https://hirequest-4cy7.onrender.com/api/applications/${id}`,
         {},
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
-
       setApplied(true);
-      toast.success("Application submitted successfully!");
+      toast.success("Application submitted!");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to apply");
-    } finally {
-      setApplying(false);
+      console.error("Application error:", err);
+      if (err.response?.status === 401) {
+        logout();
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error(err.response?.data?.message || "Application failed");
+      }
     }
   };
 
