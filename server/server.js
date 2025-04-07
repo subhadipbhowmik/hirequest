@@ -1,13 +1,12 @@
 const express = require("express");
 const connectDB = require("./config/db.js");
 const cors = require("cors");
-const app = express();
 const dotenv = require("dotenv");
-const placementRoutes = require("./routes/placementRoutes");
+const app = express();
 
 dotenv.config();
 
-// middlewares
+// Middlewares
 app.use(express.json());
 app.use(
   cors({
@@ -17,19 +16,15 @@ app.use(
   })
 );
 
-// connect to db
+// Database connection
 connectDB();
 
-// routes
-app.get("/api/status", (req, res) => {
-  res.json({ status: "ok" });
-});
-
-// Student routes
+// Routes
 app.use("/api/students", require("./routes/studentRoutes"));
-app.use("/api", placementRoutes);
-app.use("/api", placementRoutes);
+app.use("/api/placements", require("./routes/placementRoutes"));
+app.use("/api/applications", require("./routes/applicationRoutes"));
 
-app.listen(5005, () => console.log("Server started on port 5005"));
+app.get("/api/status", (req, res) => res.json({ status: "OK" }));
 
-module.exports = app;
+const PORT = process.env.PORT || 5005;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

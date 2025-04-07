@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const { signup } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     course: "",
@@ -16,10 +19,7 @@ const SignUp = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -27,41 +27,18 @@ const SignUp = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "https://hirequest-4cy7.onrender.com/api/students/signup",
-        formData
-      );
-
-      toast.success("Account created successfully!", {
-        duration: 4000,
-        position: "top-center",
-        style: {
-          background: "#4BB543",
-          color: "#fff",
-        },
-      });
-
-      // Reset form after successful submission
-      setFormData({
-        name: "",
-        course: "",
-        uid: "",
-        phoneNumber: "",
-        email: "",
-        password: "",
-      });
-    } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Signup failed. Please try again.",
-        {
-          duration: 4000,
-          position: "top-center",
-          style: {
-            background: "#FF3333",
-            color: "#fff",
-          },
-        }
-      );
+      const success = await signup(formData);
+      if (success) {
+        setFormData({
+          name: "",
+          course: "",
+          uid: "",
+          phoneNumber: "",
+          email: "",
+          password: "",
+        });
+        navigate("/profile");
+      }
     } finally {
       setLoading(false);
     }

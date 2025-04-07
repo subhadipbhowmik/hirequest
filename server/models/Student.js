@@ -34,6 +34,12 @@ const studentSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    applications: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Application",
+      },
+    ],
   },
   { timestamps: true } // Adds createdAt & updatedAt fields
 );
