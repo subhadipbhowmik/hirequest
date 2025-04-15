@@ -20,14 +20,14 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      match: [/^\d{10}$/, "Please enter a valid 10-digit phone number"], // Validates a 10-digit number
+      match: [/^\d{10}$/, "Please enter a valid 10-digit phone number"],
     },
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
-      match: [/.+\@.+\..+/, "Please enter a valid email address"], // Basic email validation
+      match: [/.+\@.+\..+/, "Please enter a valid email address"],
     },
     password: {
       type: String,
@@ -41,7 +41,7 @@ const studentSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true } // Adds createdAt & updatedAt fields
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Student", studentSchema);

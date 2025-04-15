@@ -1,83 +1,105 @@
-const Placement = require("../models/PlacementModel");
-
-// Add new placement
-exports.addPlacement = async (req, res) => {
-  try {
-    const requiredFields = [
-      "companyName",
-      "driveType",
-      "campusDriveDate",
-      "companyWebsite",
-      "streamRequired",
-      "eligibilityCriteria",
-      "batch",
-      "position",
-      "jobLocation",
-      "payPackage",
-      "placementProcess",
-    ];
-
-    for (const field of requiredFields) {
-      if (!req.body[field]) {
-        return res.status(400).json({
-          success: false,
-          message: `${field} is required`,
-        });
-      }
-    }
-
-    const newPlacement = await Placement.create(req.body);
-
-    res.status(201).json({
-      success: true,
-      message: "Placement added successfully",
-      placement: newPlacement,
-    });
-  } catch (error) {
-    console.error("Add placement error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-};
+const Placement = require("../models/Placement");
+const Application = require("../models/Application");
+const Student = require("../models/Student");
 
 // Get all placements
 exports.getAllPlacements = async (req, res) => {
   try {
-    const placements = await Placement.find().sort({ campusDriveDate: 1 });
-    res.status(200).json({
-      success: true,
-      count: placements.length,
-      placements,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    const placements = await Placement.find().sort({ createdAt: -1 });
+    res.json(placements);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-// Get single placement
-exports.getPlacement = async (req, res) => {
+// Get placement by ID
+exports.getPlacementById = async (req, res) => {
   try {
     const placement = await Placement.findById(req.params.id);
+
     if (!placement) {
-      return res.status(404).json({
-        success: false,
-        message: "Placement not found",
-      });
+      return res.status(404).json({ message: "Placement not found" });
     }
-    res.status(200).json({
-      success: true,
-      placement,
+
+    res.json(placement);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === "ObjectId") {
+      return res.status(404).json({ message: "Placement not found" });
+    }
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Add new placement (admin only)
+exports.addPlacement = async (req, res) => {
+  try {
+    const newPlacement = new Placement(req.body);
+    const placement = await newPlacement.save();
+    res.status(201).json(placement);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Apply for a placement
+exports.applyForPlacement = async (req, res) => {
+  try {
+    const placementId = req.params.id;
+    const studentId = req.student._id;
+
+    // Check if placement exists
+    const placement = await Placement.findById(placementId);
+    if (!placement) {
+      return res.status(404).json({ message: "Placement not found" });
+    }
+
+    // Check if already applied
+    const existingApplication = await Application.findOne({
+      student: studentId,
+      placement: placementId,
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
+
+    if (existingApplication) {
+      return res
+        .status(400)
+        .json({ message: "Already applied for this placement" });
+    }
+
+    // Create application
+    const application = new Application({
+      student: studentId,
+      placement: placementId,
     });
+
+    await application.save();
+
+    // Update student's applications
+    await Student.findByIdAndUpdate(studentId, {
+      $push: { applications: application._id },
+    });
+
+    res
+      .status(201)
+      .json({ message: "Successfully applied for placement", application });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Get all applications for a student
+exports.getStudentApplications = async (req, res) => {
+  try {
+    const applications = await Application.find({ student: req.student._id })
+      .populate("placement")
+      .sort({ appliedAt: -1 });
+
+    res.json(applications);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server Error" });
   }
 };

@@ -1,63 +1,37 @@
 const express = require("express");
-const connectDB = require("./config/db.js");
 const cors = require("cors");
-const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+const authRoutes = require("./routes/authRoutes");
+const placementRoutes = require("./routes/placementRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+
+// Initialize express app
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Load environment variables first
-dotenv.config();
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
-// Enhanced CORS configuration
-app.use(
-  cors({
-    origin: "https://hirequest-cu.vercel.app",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "Accept",
-    ],
-    exposedHeaders: ["Authorization"],
-  })
-);
-
-// Body parser middleware
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Database connection
-connectDB();
-
 // Routes
-app.use("/api/students", require("./routes/studentRoutes"));
-app.use("/api/placements", require("./routes/placementRoutes"));
-app.use("/api/applications", require("./routes/applicationRoutes"));
+app.use("/api", authRoutes);
+app.use("/api", placementRoutes);
+app.use("/api", profileRoutes);
 
-// Enhanced health check endpoint
-app.get("/api/status", (req, res) =>
-  res.status(200).json({
-    status: "OK",
-    timestamp: new Date().toISOString(),
-  })
-);
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(`❗ [${new Date().toISOString()}] Error: ${err.message}`);
-  res.status(err.statusCode || 500).json({
-    success: false,
-  });
+// Root route
+app.get("/", (req, res) => {
+  res.send("HireQuest API is running");
 });
 
-// Handle 404s
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: "Endpoint not found",
-  });
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-
-const PORT = 5005;
-
-app.listen(PORT, () => console.log(`Server running in mode on port ${PORT}`));
