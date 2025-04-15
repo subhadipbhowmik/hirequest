@@ -14,8 +14,8 @@ const Navbar = () => {
     { name: "Home", href: "/" },
     { name: "Placements", href: "/all-placements" },
     { name: "Placement Status", href: "/placement-status" },
+    { name: "Placement Analysis", href: "/placement-chart" },
     { name: "Resources", href: "/resources" },
-    { name: "About", href: "/about" },
   ];
 
   const handleLogout = () => {
