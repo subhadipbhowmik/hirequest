@@ -16,6 +16,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import PlacementChecker from "./pages/PlacementChecker";
 import PlacementGraph from "./pages/PlacementChart";
+import ResumeBuilder from "./pages/ResumeBuilder";
 
 function App() {
   return (
@@ -35,6 +36,8 @@ function App() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/placement-status" element={<PlacementChecker />} />
             <Route path="/placement-chart" element={<PlacementGraph />} />
+            <Route path="/placement-chart" element={<PlacementGraph />} />
+            <Route path="/resume-builder" element={<ResumeBuilder />} />
 
             {/* Protected Routes - Only login required */}
 
