@@ -14,6 +14,7 @@ import Resources from "./pages/Resources";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import PlacementChecker from "./pages/PlacementChecker";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Route path="/placements/:id" element={<PlacementDetails />} />
             <Route path="/about" element={<About />} />
             <Route path="/resources" element={<Resources />} />
+            <Route path="/placement-status" element={<PlacementChecker />} />
 
             {/* Protected Routes - Only login required */}
             <Route element={<ProtectedRoute />}>
